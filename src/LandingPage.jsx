@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 export default function LandingPage() {
   const [formData, setFormData] = useState({
@@ -9,6 +9,23 @@ export default function LandingPage() {
     funds: '1억원 내외'
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // 광고 매체사 픽셀 추적 초기화 (PageView)
+  useEffect(() => {
+    const gaId = import.meta.env.VITE_GA_TRACKING_ID;
+    const metaId = import.meta.env.VITE_META_PIXEL_ID;
+    const daangnId = import.meta.env.VITE_DAANGN_PIXEL_ID;
+
+    if (window.gtag && gaId) window.gtag('config', gaId);
+    if (window.fbq && metaId) {
+      window.fbq('init', metaId);
+      window.fbq('track', 'PageView');
+    }
+    if (window.dv && daangnId) {
+      window.dv('init', daangnId);
+      window.dv('track', 'ViewContent');
+    }
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -23,6 +40,12 @@ export default function LandingPage() {
       });
       const resData = await response.json();
       if (resData.result === 'success') {
+        
+        // 데이터 적재 성공 시 광고 매체사로 전환(Lead) 스크립트 발사
+        if (window.gtag) window.gtag('event', 'generate_lead', { currency: 'KRW', value: 0 });
+        if (window.fbq) window.fbq('track', 'Lead');
+        if (window.dv) window.dv('track', 'CompleteRegistration');
+
         alert('한도 조회가 정상적으로 접수되었습니다. 담당 매니저가 곧 연락드립니다.');
         setFormData({ hospital_name: '', manager_name: '', phone: '', asset_type: '카드매출 (월 5천 이상)', funds: '1억원 내외' });
       } else {
@@ -67,7 +90,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* 2. 핵심 요약 실적 지표 섹션 */}
+      {/* 2. 실적 지표 섹션 */}
       <section className="py-12 bg-white border-b border-slate-100 px-4">
         <div className="max-w-4xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
           <div className="p-4">
@@ -89,7 +112,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* 3. 리드 수집 신청 폼 섹션 (체크박스 추가 완료) */}
+      {/* 3. 신청 폼 섹션 */}
       <section className="py-16 px-4 max-w-xl mx-auto">
         <div className="bg-white p-8 rounded-3xl shadow-xl border border-slate-100 transition-all duration-300 hover:shadow-2xl">
           <h3 className="text-2xl font-bold text-center mb-2">원장님 전용 무료 한도 조회</h3>
@@ -149,7 +172,6 @@ export default function LandingPage() {
               </select>
             </div>
 
-            {/* 광고 심의 통과용 필수 체크박스 존 */}
             <div className="space-y-2 pt-2 text-xs text-slate-600 border-t border-slate-100">
               <label className="flex items-center gap-2.5 cursor-pointer p-1 rounded hover:bg-slate-50 transition-colors">
                 <input 
@@ -181,17 +203,17 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* 4. 광고 심의 및 권리 보증 푸터 섹션 */}
+      {/* 4. 푸터 섹션 */}
       <footer className="bg-slate-900 text-slate-400 text-xs py-12 px-4 border-t border-slate-800">
         <div className="max-w-4xl mx-auto space-y-4">
           <div className="flex flex-wrap gap-x-6 gap-y-2 text-slate-300 font-semibold">
-            <span>상호명: [노네임]</span>
-            <span>대표자: [이정현]</span>
-            <span>사업자등록번호: [635-67-00527]</span>
+            <span>상호명: 노네임</span>
+            <span>대표자: 이정현</span>
+            <span>사업자등록번호: 635-67-00527</span>
           </div>
           
           <div className="space-y-1 text-slate-500">
-            <p>주소: [대구 북구 동북로291 901-a97]</p>
+            <p>주소: 대구 북구 동북로291 901-a97</p>
             <p>고객상담센터: 050-6553-1135 | 이메일: leezdb88@gmail.com</p>
           </div>
           
