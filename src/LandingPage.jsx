@@ -9,6 +9,13 @@ export default function LandingPage() {
     funds: '1억원 내외'
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // 🔥 Q&A 아코디언 상태 관리 토글 (클릭 시 열리고 닫히는 기능)
+  const [activeFaq, setActiveFaq] = useState(null);
+
+  const toggleFaq = (index) => {
+    setActiveFaq(activeFaq === index ? null : index);
+  };
 
   // 1. 매체사 광고 추적 픽셀 엔진 (PageView)
   useEffect(() => {
@@ -31,7 +38,7 @@ export default function LandingPage() {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // 🔒 외부인은 절대 알 수 없는 내부 보안 릴레이 주소 배치
+    // 🔒 내부 보안 릴레이 서버리스 주소
     const GAS_WEB_APP_URL = "/api/submit";
 
     try {
@@ -43,7 +50,6 @@ export default function LandingPage() {
       const resData = await response.json();
       
       if (resData.result === 'success') {
-        
         // 2. 광고 매체사 전환(Lead) 스크립트 발사
         if (window.gtag) window.gtag('event', 'generate_lead', { currency: 'KRW', value: 0 });
         if (window.fbq) window.fbq('track', 'Lead');
@@ -56,11 +62,35 @@ export default function LandingPage() {
       }
     } catch (error) {
       console.error(error);
-      alert('서ver 연결 실패. 네트워크 상태를 확인해 주세요.');
+      alert('서버 연결 실패. 네트워크 상태를 확인해 주세요.');
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  // FAQ 데이터 구조 정의
+  const faqData = [
+    {
+      q: "단순 한도 조회만 해도 신용점수에 영향이 가나요?",
+      a: "아니요, 전혀 영향이 없습니다. 본 서비스는 정식 금융권 가이드라인을 준수하는 간이 사전 심사 방식으로 진행되므로, 단순 한도 확인만으로는 신용점수 하락이나 타 금융권 조회 이력이 남지 않으니 안심하고 조회하셔도 됩니다."
+    },
+    {
+      q: "DSR 규제 제약 제로가 정말 합법적으로 가능한가요?",
+      a: "네, 100% 합법적인 금융 구조입니다. 일반 가계 대출이나 시설 자금 대출과 달리, 의료기기 리스 운용 및 자산 유동화 방식을 채택하기 때문에 개인 DSR 부채 비율 산정에서 전면 제외됩니다. 이미 1금융권 기대출 한도가 꽉 차 있으신 원장님들께서도 추가 자금을 대규모로 확보하실 수 있는 핵심 비결입니다."
+    },
+    {
+      q: "종합소득세 비용처리와 부가세 환급 혜택의 원리가 무엇인가요?",
+      a: "매월 발행되는 리스료 세금계산서를 통해 종합소득세 신고 시 전액 합법적인 필요경비(손비) 처리가 인정되어 원장님의 최고 세율 소득 구간 자체를 하향 안정화할 수 있습니다. 또한, 장비 도입 시 발생하는 부가세는 매입세액공제 전담 프로세스를 통해 안전하게 전액 환급받으실 수 있도록 세무 가이드를 함께 지원합니다."
+    },
+    {
+      q: "진행 과정에서 별도의 컨설팅 수수료나 중개 비용 요구가 있나요?",
+      a: "절대 없습니다. 저희 솔루션은 금융사 및 여신전문금융기관과의 정식 업무 가맹 계약에 의해 운영되므로, 원장님께 어떠한 명목의 수수료, 취급 수수료, 진행비 명목의 선입금도 요구하지 않으며 이는 법적으로 전면 금지되어 있습니다."
+    },
+    {
+      q: "신청 후 실제 승인 및 집행까지 기간이 얼마나 걸리나요?",
+      a: "무료 접수 완료 후 영업일 기준 24시간 이내에 전담 메디컬 금융 매니저가 배정되어 1차 비대면 가이드를 드립니다. 이후 정식 심사 승인은 평균 2~3일 내에 완료되며, 최종 계약 조율 후 의료기기 대금 지급 및 자금 집행까지는 평균 1주일 이내에 신속하게 마무리됩니다."
+    }
+  ];
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-800 font-sans antialiased">
@@ -97,7 +127,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* 2. 실적 지표 섹션 */}
+      {/* 2. 핵심 요약 실적 지표 섹션 */}
       <section className="py-12 bg-white border-b border-slate-100 px-4">
         <div className="max-w-4xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
           <div className="p-4">
@@ -202,8 +232,42 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* 4. 푸터 섹션 */}
-      <footer className="bg-slate-900 text-slate-400 text-xs py-12 px-4 border-t border-slate-800">
+      {/* 🔥 4. [신설] 원장님 다이렉트 의문 해결 Q&A 섹션 */}
+      <section className="py-16 bg-white border-t border-b border-slate-100 px-4">
+        <div className="max-w-2xl mx-auto">
+          <h2 className="text-2xl font-bold text-center text-slate-900 mb-2">가장 자주 묻는 질문</h2>
+          <p className="text-center text-sm text-slate-500 mb-10">금융 솔루션 신청 전 원장님들께서 가장 우려하시는 사실을 명확히 대답해 드립니다.</p>
+          
+          <div className="space-y-4">
+            {faqData.map((faq, index) => {
+              const isOpen = activeFaq === index;
+              return (
+                <div key={index} className="border border-slate-200 rounded-2xl overflow-hidden bg-slate-50 transition-all duration-300">
+                  <button
+                    type="button"
+                    onClick={() => toggleFaq(index)}
+                    className="w-full text-left p-5 font-bold text-sm md:text-base flex items-center justify-between gap-4 bg-white hover:bg-slate-50 transition-colors"
+                  >
+                    <span className="text-slate-900 break-keep"><span className="text-indigo-600 mr-2">Q.</span> {faq.q}</span>
+                    <span className={`text-indigo-500 font-bold text-xl transform transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}>
+                      ▼
+                    </span>
+                  </button>
+                  
+                  <div className={`transition-all duration-300 overflow-hidden ${isOpen ? 'max-h-60 border-t border-slate-150' : 'max-h-0'}`}>
+                    <p className="p-5 text-sm leading-relaxed text-slate-600 bg-slate-50 break-keep">
+                      {faq.a}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* 5. 푸터 섹션 */}
+      <footer className="bg-slate-900 text-slate-400 text-xs py-12 px-4">
         <div className="max-w-4xl mx-auto space-y-4">
           <div className="flex flex-wrap gap-x-6 gap-y-2 text-slate-300 font-semibold">
             <span>상호명: 광고대행사 노네임</span>
