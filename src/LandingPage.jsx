@@ -68,9 +68,16 @@ export default function LandingPage() {
             <span className="bg-indigo-600 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
               메디컬 금융 솔루션
             </span>
-            <h1 className="text-3xl md:text-5xl font-extrabold leading-tight">
-              의료기기·인테리어 비용,<br />
-              <span className="text-indigo-400">그냥 리스</span>로 하십니까?
+            {/* 71번 줄부터의 코드 구조 */}
+{/* 변경 전 h1을 지우고 아래 코드로 교체하세요 */}
+<h1 className="text-3xl md:text-5xl font-extrabold leading-tight break-keep">
+  의료기기 · 인테리어 비용,<br />
+  <span className="text-indigo-400">그냥 리스</span>로 하십니까?
+</h1> {/* 75번 줄: 여기 하나만 남기고 아래 중복된 </h1>는 지우세요! */}
+
+<p className="text-slate-300 text-lg">
+  DSR 규제 제약 제로! 의사 면허 보유 시 최대 3억 무담보 지원. 100% 부가세 환급과 전액 비용처리로 종합소득세 구간을 낮추십시오.
+</p>
             </h1>
             <p className="text-slate-300 text-lg">
               DSR 규제 제약 제로! 의사 면허 보유 시 최대 3억 무담보 지원. 100% 부가세 환급과 전액 비용처리로 종합소득세 구간을 낮추십시오.
