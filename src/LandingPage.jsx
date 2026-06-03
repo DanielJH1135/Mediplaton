@@ -81,10 +81,12 @@ export default function LandingPage() {
           
           <div className="md:w-1/2 mt-10 md:mt-0 flex justify-center relative">
             <div className="w-72 h-72 md:w-96 md:h-96 rounded-2xl overflow-hidden shadow-2xl transform hover:scale-105 transition-transform duration-500">
+              {/* 사장님의 생성 이미지가 출력되는 코드입니다. */}
               <img 
-                src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&w=800&q=80" 
+                src="/images/hero-doctor.jpg" 
                 alt="메디컬 파이낸스 가이드" 
                 className="w-full h-full object-cover"
+                onError={(e) => { e.target.src = 'https://via.placeholder.com/400x400?text=Medical+Finance+Guide'; }}
               />
             </div>
           </div>
