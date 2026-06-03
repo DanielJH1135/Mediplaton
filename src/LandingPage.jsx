@@ -83,11 +83,14 @@ export default function LandingPage() {
             <div className="w-72 h-72 md:w-96 md:h-96 rounded-2xl overflow-hidden shadow-2xl transform hover:scale-105 transition-transform duration-500">
               {/* 사장님의 생성 이미지가 출력되는 코드입니다. */}
               <img 
-                src="/images/hero-doctor.jpg" 
-                alt="메디컬 파이낸스 가이드" 
-                className="w-full h-full object-cover"
-                onError={(e) => { e.target.src = 'https://via.placeholder.com/400x400?text=Medical+Finance+Guide'; }}
-              />
+  src="/images/hero-doctor.jpg" 
+  alt="메디컬 파이낸스 가이드" 
+  className="w-full h-full object-cover"
+  onError={(e) => { 
+    e.target.onerror = null; // 🔥 에러 발생 시 재호출을 즉시 차단하여 무한 루프를 방지합니다.
+    e.target.src = 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&w=800&q=80'; // 100% 안전한 대체 이미지
+  }}
+/>
             </div>
           </div>
         </div>
