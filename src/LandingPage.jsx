@@ -52,12 +52,14 @@ export default function LandingPage() {
       } else {
         alert('접수 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.');
       }
-    } catch (error) {
-      console.error(error);
-      alert('서버 연결 실패. 네트워크 상태를 확인해 주세요.');
-    } finally {
-      setIsSubmitting(false);
-    }
+    // 기존의 catch(error) 블록을 찾아서 잠시 이 내용으로 교체합니다.
+} catch (error) {
+  console.error(error);
+  // 에러의 진짜 본모습을 팝업으로 직접 띄워 확인합니다.
+  alert('실제 에러 원인 메시지: ' + error.message + '\n주소확인: ' + import.meta.env.VITE_GAS_URL);
+} finally {
+  setIsSubmitting(false);
+}
   };
 
   return (
@@ -234,7 +236,7 @@ export default function LandingPage() {
               ※ 본 사전 한도 조회 서비스는 간이 조회 방식으로 진행되어 원장님의 개인 신용등급에 어떠한 영향도 주지 않으며, 신청 및 상담 과정에서 별도의 불법 중개 수수료나 취급 수수료의 선입금을 절대 요구하지 않습니다.
             </p>
             <p className="pt-2 text-slate-600 font-medium">
-              © 2026 Platon Marketing. All Rights Reserved.
+              © 2026 Noname Marketing. All Rights Reserved.
             </p>
           </div>
         </div>
