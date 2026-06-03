@@ -10,7 +10,7 @@ export default function LandingPage() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // 1. 페이지 로드 시 각 매체사 픽셀 초기화 및 페이지뷰(PageView) 전송
+  // 1. 매체사 광고 추적 픽셀 엔진 (PageView)
   useEffect(() => {
     const gaId = import.meta.env.VITE_GA_TRACKING_ID;
     const metaId = import.meta.env.VITE_META_PIXEL_ID;
@@ -27,24 +27,24 @@ export default function LandingPage() {
     }
   }, []);
 
- const handleSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // 🚫 구글 주소를 통째로 지우고, 우리 보안 서버 주소로 대체합니다.
-    const GAS_WEB_APP_URL = "/api/submit"; 
+    // 🔒 외부인은 절대 알 수 없는 내부 보안 릴레이 주소 배치
+    const GAS_WEB_APP_URL = "/api/submit";
 
     try {
       const response = await fetch(GAS_WEB_APP_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' }, // 헤더 추가로 데이터 규격 안정화
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });
       const resData = await response.json();
       
       if (resData.result === 'success') {
         
-        // 2. 구글 시트 적재 성공 시 매체사로 전환(Lead) 스크립트 전송
+        // 2. 광고 매체사 전환(Lead) 스크립트 발사
         if (window.gtag) window.gtag('event', 'generate_lead', { currency: 'KRW', value: 0 });
         if (window.fbq) window.fbq('track', 'Lead');
         if (window.dv) window.dv('track', 'CompleteRegistration');
@@ -52,16 +52,14 @@ export default function LandingPage() {
         alert('한도 조회가 정상적으로 접수되었습니다. 담당 매니저가 곧 연락드립니다.');
         setFormData({ hospital_name: '', manager_name: '', phone: '', asset_type: '카드매출 (월 5천 이상)', funds: '1억원 내외' });
       } else {
-        alert('접수 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.');
+        alert('접수 중 오류가 발생했습니다: ' + JSON.stringify(resData));
       }
-    // 기존의 catch(error) 블록을 찾아서 잠시 이 내용으로 교체합니다.
-} catch (error) {
-  console.error(error);
-  // 에러의 진짜 본모습을 팝업으로 직접 띄워 확인합니다.
-  alert('실제 에러 원인 메시지: ' + error.message + '\n주소확인: ' + import.meta.env.VITE_GAS_URL);
-} finally {
-  setIsSubmitting(false);
-}
+    } catch (error) {
+      console.error(error);
+      alert('서ver 연결 실패. 네트워크 상태를 확인해 주세요.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -85,22 +83,21 @@ export default function LandingPage() {
           
           <div className="md:w-1/2 mt-10 md:mt-0 flex justify-center relative">
             <div className="w-72 h-72 md:w-96 md:h-96 rounded-2xl overflow-hidden shadow-2xl transform hover:scale-105 transition-transform duration-500">
-              {/* 사장님의 생성 이미지가 출력되는 코드입니다. */}
               <img 
-  src="/images/hero-doctor.jpg" 
-  alt="메디컬 파이낸스 가이드" 
-  className="w-full h-full object-cover"
-  onError={(e) => { 
-    e.target.onerror = null; // 🔥 에러 발생 시 재호출을 즉시 차단하여 무한 루프를 방지합니다.
-    e.target.src = 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&w=800&q=80'; // 100% 안전한 대체 이미지
-  }}
-/>
+                src="/images/hero-doctor.jpg" 
+                alt="메디컬 파이낸스 가이드" 
+                className="w-full h-full object-cover"
+                onError={(e) => { 
+                  e.target.onerror = null;
+                  e.target.src = 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&w=800&q=80'; 
+                }}
+              />
             </div>
           </div>
         </div>
       </section>
 
-      {/* 2. 핵심 요약 실적 지표 섹션 */}
+      {/* 2. 실적 지표 섹션 */}
       <section className="py-12 bg-white border-b border-slate-100 px-4">
         <div className="max-w-4xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
           <div className="p-4">
@@ -182,22 +179,13 @@ export default function LandingPage() {
               </select>
             </div>
 
-            {/* 광고 심의 필수 체크박스 존 */}
             <div className="space-y-2 pt-2 text-xs text-slate-600 border-t border-slate-100">
               <label className="flex items-center gap-2.5 cursor-pointer p-1 rounded hover:bg-slate-50 transition-colors">
-                <input 
-                  type="checkbox" 
-                  required 
-                  className="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer" 
-                />
+                <input type="checkbox" required className="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer" />
                 <span className="select-none"><span className="text-red-500 font-bold">[필수]</span> 개인정보 수집 및 이용 동의</span>
               </label>
               <label className="flex items-center gap-2.5 cursor-pointer p-1 rounded hover:bg-slate-50 transition-colors">
-                <input 
-                  type="checkbox" 
-                  required 
-                  className="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer" 
-                />
+                <input type="checkbox" required className="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer" />
                 <span className="select-none"><span className="text-red-500 font-bold">[필수]</span> 현재 금융기관 연체 및 세금 체납 사실이 전혀 없습니다.</span>
               </label>
             </div>
@@ -214,7 +202,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* 4. 광고 심의 및 권리 보증 푸터 섹션 */}
+      {/* 4. 푸터 섹션 */}
       <footer className="bg-slate-900 text-slate-400 text-xs py-12 px-4 border-t border-slate-800">
         <div className="max-w-4xl mx-auto space-y-4">
           <div className="flex flex-wrap gap-x-6 gap-y-2 text-slate-300 font-semibold">
@@ -238,7 +226,7 @@ export default function LandingPage() {
               ※ 본 사전 한도 조회 서비스는 간이 조회 방식으로 진행되어 원장님의 개인 신용등급에 어떠한 영향도 주지 않으며, 신청 및 상담 과정에서 별도의 불법 중개 수수료나 취급 수수료의 선입금을 절대 요구하지 않습니다.
             </p>
             <p className="pt-2 text-slate-600 font-medium">
-              © 2026 Noname Marketing. All Rights Reserved.
+              © 2026 Platon Marketing. All Rights Reserved.
             </p>
           </div>
         </div>
