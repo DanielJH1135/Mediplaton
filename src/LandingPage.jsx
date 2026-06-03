@@ -27,15 +27,17 @@ export default function LandingPage() {
     }
   }, []);
 
-  const handleSubmit = async (e) => {
+ const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    const GAS_WEB_APP_URL = import.meta.env.VITE_GAS_URL;
+    // 🚫 구글 주소를 통째로 지우고, 우리 보안 서버 주소로 대체합니다.
+    const GAS_WEB_APP_URL = "/api/submit"; 
 
     try {
       const response = await fetch(GAS_WEB_APP_URL, {
         method: 'POST',
+        headers: { 'Content-Type': 'application/json' }, // 헤더 추가로 데이터 규격 안정화
         body: JSON.stringify(formData),
       });
       const resData = await response.json();
