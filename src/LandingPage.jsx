@@ -10,7 +10,7 @@ export default function LandingPage() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // 광고 매체사 픽셀 추적 초기화 (PageView)
+  // 1. 페이지 로드 시 각 매체사 픽셀 초기화 및 페이지뷰(PageView) 전송
   useEffect(() => {
     const gaId = import.meta.env.VITE_GA_TRACKING_ID;
     const metaId = import.meta.env.VITE_META_PIXEL_ID;
@@ -39,9 +39,10 @@ export default function LandingPage() {
         body: JSON.stringify(formData),
       });
       const resData = await response.json();
+      
       if (resData.result === 'success') {
         
-        // 데이터 적재 성공 시 광고 매체사로 전환(Lead) 스크립트 발사
+        // 2. 구글 시트 적재 성공 시 매체사로 전환(Lead) 스크립트 전송
         if (window.gtag) window.gtag('event', 'generate_lead', { currency: 'KRW', value: 0 });
         if (window.fbq) window.fbq('track', 'Lead');
         if (window.dv) window.dv('track', 'CompleteRegistration');
@@ -61,6 +62,7 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-800 font-sans antialiased">
+      
       {/* 1. Hero 섹션 */}
       <section className="relative bg-gradient-to-br from-slate-900 to-indigo-950 text-white py-20 px-4 overflow-hidden">
         <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between relative z-10">
@@ -68,16 +70,9 @@ export default function LandingPage() {
             <span className="bg-indigo-600 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
               메디컬 금융 솔루션
             </span>
-            {/* 71번 줄부터의 코드 구조 */}
-{/* 변경 전 h1을 지우고 아래 코드로 교체하세요 */}
-<h1 className="text-3xl md:text-5xl font-extrabold leading-tight break-keep">
-  의료기기 · 인테리어 비용,<br />
-  <span className="text-indigo-400">그냥 리스</span>로 하십니까?
-</h1> {/* 75번 줄: 여기 하나만 남기고 아래 중복된 </h1>는 지우세요! */}
-
-<p className="text-slate-300 text-lg">
-  DSR 규제 제약 제로! 의사 면허 보유 시 최대 3억 무담보 지원. 100% 부가세 환급과 전액 비용처리로 종합소득세 구간을 낮추십시오.
-</p>
+            <h1 className="text-3xl md:text-5xl font-extrabold leading-tight break-keep">
+              의료기기 · 인테리어 비용,<br />
+              <span className="text-indigo-400">그냥 리스</span>로 하십니까?
             </h1>
             <p className="text-slate-300 text-lg">
               DSR 규제 제약 제로! 의사 면허 보유 시 최대 3억 무담보 지원. 100% 부가세 환급과 전액 비용처리로 종합소득세 구간을 낮추십시오.
@@ -87,17 +82,16 @@ export default function LandingPage() {
           <div className="md:w-1/2 mt-10 md:mt-0 flex justify-center relative">
             <div className="w-72 h-72 md:w-96 md:h-96 rounded-2xl overflow-hidden shadow-2xl transform hover:scale-105 transition-transform duration-500">
               <img 
-                src="/images/hero-doctor.jpg" 
+                src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&w=800&q=80" 
                 alt="메디컬 파이낸스 가이드" 
                 className="w-full h-full object-cover"
-                onError={(e) => { e.target.src = 'https://via.placeholder.com/400x400?text=Medical+Finance+Guide'; }} 
               />
             </div>
           </div>
         </div>
       </section>
 
-      {/* 2. 실적 지표 섹션 */}
+      {/* 2. 핵심 요약 실적 지표 섹션 */}
       <section className="py-12 bg-white border-b border-slate-100 px-4">
         <div className="max-w-4xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
           <div className="p-4">
@@ -119,7 +113,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* 3. 신청 폼 섹션 */}
+      {/* 3. 리드 수집 신청 폼 섹션 */}
       <section className="py-16 px-4 max-w-xl mx-auto">
         <div className="bg-white p-8 rounded-3xl shadow-xl border border-slate-100 transition-all duration-300 hover:shadow-2xl">
           <h3 className="text-2xl font-bold text-center mb-2">원장님 전용 무료 한도 조회</h3>
@@ -179,6 +173,7 @@ export default function LandingPage() {
               </select>
             </div>
 
+            {/* 광고 심의 필수 체크박스 존 */}
             <div className="space-y-2 pt-2 text-xs text-slate-600 border-t border-slate-100">
               <label className="flex items-center gap-2.5 cursor-pointer p-1 rounded hover:bg-slate-50 transition-colors">
                 <input 
@@ -210,11 +205,11 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* 4. 푸터 섹션 */}
+      {/* 4. 광고 심의 및 권리 보증 푸터 섹션 */}
       <footer className="bg-slate-900 text-slate-400 text-xs py-12 px-4 border-t border-slate-800">
         <div className="max-w-4xl mx-auto space-y-4">
           <div className="flex flex-wrap gap-x-6 gap-y-2 text-slate-300 font-semibold">
-            <span>상호명: 노네임</span>
+            <span>상호명: 광고대행사 노네임</span>
             <span>대표자: 이정현</span>
             <span>사업자등록번호: 635-67-00527</span>
           </div>
