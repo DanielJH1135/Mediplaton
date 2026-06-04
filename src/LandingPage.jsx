@@ -1,16 +1,15 @@
 import React, { useState, useEffect } from 'react';
 
 export default function LandingPage() {
+  // 폼 간소화: 이탈률을 최소화하기 위해 필수 정보 3개만 수집
   const [formData, setFormData] = useState({
     hospital_name: '',
     manager_name: '',
-    phone: '',
-    asset_type: '카드매출 (월 5천 이상)',
-    funds: '1억원 내외'
+    phone: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   
-  // 🔥 Q&A 아코디언 상태 관리 토글 (클릭 시 열리고 닫히는 기능)
+  // Q&A 아코디언 상태 관리
   const [activeFaq, setActiveFaq] = useState(null);
 
   const toggleFaq = (index) => {
@@ -38,14 +37,21 @@ export default function LandingPage() {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // 🔒 내부 보안 릴레이 서버리스 주소
+    // 🔒 외부 추적이 원천 차단된 실서버 내부 보안 릴레이 API 호출
     const GAS_WEB_APP_URL = "/api/submit";
+
+    // 구글 시트 및 디스코드 봇 규격 유지를 위한 데이터 매립
+    const payload = {
+      ...formData,
+      asset_type: '상담 시 확인',
+      funds: '상담 시 확인'
+    };
 
     try {
       const response = await fetch(GAS_WEB_APP_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       });
       const resData = await response.json();
       
@@ -55,8 +61,8 @@ export default function LandingPage() {
         if (window.fbq) window.fbq('track', 'Lead');
         if (window.dv) window.dv('track', 'CompleteRegistration');
 
-        alert('한도 조회가 정상적으로 접수되었습니다. 담당 매니저가 곧 연락드립니다.');
-        setFormData({ hospital_name: '', manager_name: '', phone: '', asset_type: '카드매출 (월 5천 이상)', funds: '1억원 내외' });
+        alert('자금 조달 방안 사전 진단 신청이 정상 접수되었습니다. 전담 매니저가 신속하게 연락드리겠습니다.');
+        setFormData({ hospital_name: '', manager_name: '', phone: '' });
       } else {
         alert('접수 중 오류가 발생했습니다: ' + JSON.stringify(resData));
       }
@@ -68,177 +74,188 @@ export default function LandingPage() {
     }
   };
 
-  // FAQ 데이터 구조 정의
   const faqData = [
     {
-      q: "단순 한도 조회만 해도 신용점수에 영향이 가나요?",
-      a: "아니요, 전혀 영향이 없습니다. 본 서비스는 정식 금융권 가이드라인을 준수하는 간이 사전 심사 방식으로 진행되므로, 단순 한도 확인만으로는 신용점수 하락이나 타 금융권 조회 이력이 남지 않으니 안심하고 조회하셔도 됩니다."
+      q: "단순 사전 진단만으로도 신용도에 변동이 생기나요?",
+      a: "아니요, 전혀 변동이 없습니다. 본 서비스는 정식 가이드라인을 준수하는 안심 사전 심사 방식을 채택하여 공식 금융권 조회 이력이 남지 않으므로 원장님의 신용도나 기존 대출 평가에 어떠한 영향도 주지 않습니다."
     },
     {
-      q: "DSR 규제 제약 제로가 정말 합법적으로 가능한가요?",
-      a: "네, 100% 합법적인 금융 구조입니다. 일반 가계 대출이나 시설 자금 대출과 달리, 의료기기 리스 운용 및 자산 유동화 방식을 채택하기 때문에 개인 DSR 부채 비율 산정에서 전면 제외됩니다. 이미 1금융권 기대출 한도가 꽉 차 있으신 원장님들께서도 추가 자금을 대규모로 확보하실 수 있는 핵심 비결입니다."
+      q: "기존 가계 대출이나 닥터론 부채 비율(DSR)이 높은데도 진행이 가능한가요?",
+      a: "네, 가능성이 높습니다. 일반 신용 대출 방식과 달리, 의료 장비 리스 및 맞춤형 유동화 구조를 복합 설계하기 때문에 기존 DSR 부채 한도 압박에서 비교적 자유롭게 자금을 유연하게 배정할 수 있습니다."
     },
     {
-      q: "종합소득세 비용처리와 부가세 환급 혜택의 원리가 무엇인가요?",
-      a: "매월 발행되는 리스료 세금계산서를 통해 종합소득세 신고 시 전액 합법적인 필요경비(손비) 처리가 인정되어 원장님의 최고 세율 소득 구간 자체를 하향 안정화할 수 있습니다. 또한, 장비 도입 시 발생하는 부가세는 매입세액공제 전담 프로세스를 통해 안전하게 전액 환급받으실 수 있도록 세무 가이드를 함께 지원합니다."
+      q: "종합소득세 손비처리와 매입세액공제 혜택은 어떤 원리인가요?",
+      a: "도입 자금 구조에 맞춰 정식 세금계산서가 발행되므로 종합소득세 신고 시 전액 합법적인 필요경비 처리가 인정되어 원장님의 고소득 최고 세율 구간을 완화할 수 있습니다. 부가세 환급 관련 세무 가이드 역시 전담 프로세스로 함께 지원됩니다."
     },
     {
-      q: "진행 과정에서 별도의 컨설팅 수수료나 중개 비용 요구가 있나요?",
-      a: "절대 없습니다. 저희 솔루션은 금융사 및 여신전문금융기관과의 정식 업무 가맹 계약에 의해 운영되므로, 원장님께 어떠한 명목의 수수료, 취급 수수료, 진행비 명목의 선입금도 요구하지 않으며 이는 법적으로 전면 금지되어 있습니다."
-    },
-    {
-      q: "신청 후 실제 승인 및 집행까지 기간이 얼마나 걸리나요?",
-      a: "무료 접수 완료 후 영업일 기준 24시간 이내에 전담 메디컬 금융 매니저가 배정되어 1차 비대면 가이드를 드립니다. 이후 정식 심사 승인은 평균 2~3일 내에 완료되며, 최종 계약 조율 후 의료기기 대금 지급 및 자금 집행까지는 평균 1주일 이내에 신속하게 마무리됩니다."
+      q: "상담 및 구조 분석 과정에서 금융 중개 수수료를 지불해야 하나요?",
+      a: "아니요, 절대 요구하지 않습니다. 저희 메디컬 파이낸셜 프로그램은 정식 금융사 및 여신전문금융기관과의 포괄 업무 협약을 기반으로 가동되므로, 원장님께 별도의 수수료나 선입금을 요구하는 행위는 일절 없으며 이는 법적으로도 엄격히 금지되어 있습니다."
     }
   ];
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-800 font-sans antialiased">
       
-      {/* 1. Hero 섹션 */}
-      <section className="relative bg-gradient-to-br from-slate-900 to-indigo-950 text-white py-20 px-4 overflow-hidden">
-        <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between relative z-10">
-          <div className="md:w-1/2 space-y-6">
-            <span className="bg-indigo-600 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
-              메디컬 금융 솔루션
+      {/* GNB (헤더 상단 바) */}
+      <header className="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-slate-100 px-4 py-3.5 md:px-6">
+        <div className="max-w-6xl mx-auto flex justify-between items-center">
+          <div className="flex items-center gap-1.5">
+            <span className="font-black text-lg tracking-tight text-slate-900">메디플라톤</span>
+            <span className="bg-indigo-50 text-indigo-600 text-[10px] font-bold px-2 py-0.5 rounded">금융사업부</span>
+          </div>
+          <a href="#diagnostic-form" className="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold px-3.5 py-2 rounded-lg transition-colors">
+            자금 조달 방안 무상 진단
+          </a>
+        </div>
+      </header>
+
+      {/* 1. 히어로 섹션 + 상단 고전환 폼 배치 */}
+      <section className="relative bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 text-white py-12 px-4 md:py-20 overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(99,102,241,0.06),transparent_50%)]" />
+        
+        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
+          
+          {/* 가치 제안 섹션 (좌측 7칸) */}
+          <div className="lg:col-span-7 text-center lg:text-left">
+            <span className="inline-block bg-indigo-600/20 text-indigo-400 text-[11px] font-bold tracking-wider px-2.5 py-1 rounded mb-4">
+              ✓ 현재 병·의원 전용 금융 프로그램 사전 한도 조회 진행 중
             </span>
-            <h1 className="text-3xl md:text-5xl font-extrabold leading-tight break-keep">
-              의료기기 · 인테리어 비용,<br />
-              <span className="text-indigo-400">그냥 리스</span>로 하십니까?
-            </h1>
-            <p className="text-slate-300 text-lg">
-              DSR 규제 제약 제로! 의사 면허 보유 시 최대 3억 무담보 지원. 100% 부가세 환급과 전액 비용처리로 종합소득세 구간을 낮추십시오.
-            </p>
-          </div>
-          
-          <div className="md:w-1/2 mt-10 md:mt-0 flex justify-center relative">
-            <div className="w-72 h-72 md:w-96 md:h-96 rounded-2xl overflow-hidden shadow-2xl transform hover:scale-105 transition-transform duration-500">
-              <img 
-                src="/images/hero-doctor.jpg" 
-                alt="메디컬 파이낸스 가이드" 
-                className="w-full h-full object-cover"
-                onError={(e) => { 
-                  e.target.onerror = null;
-                  e.target.src = 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&w=800&q=80'; 
-                }}
-              />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 2. 핵심 요약 실적 지표 섹션 */}
-      <section className="py-12 bg-white border-b border-slate-100 px-4">
-        <div className="max-w-4xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-          <div className="p-4">
-            <p className="text-3xl md:text-4xl font-black text-indigo-600">1,080억+</p>
-            <p className="text-xs text-slate-500 mt-1 font-medium">누적 매출 성과</p>
-          </div>
-          <div className="p-4">
-            <p className="text-3xl md:text-4xl font-black text-indigo-600">83%</p>
-            <p className="text-xs text-slate-500 mt-1 font-medium">심사 승인율</p>
-          </div>
-          <div className="p-4">
-            <p className="text-3xl md:text-4xl font-black text-indigo-600">1,700건+</p>
-            <p className="text-xs text-slate-500 mt-1 font-medium">누적 신청 건수</p>
-          </div>
-          <div className="p-4">
-            <p className="text-3xl md:text-4xl font-black text-indigo-600">97%</p>
-            <p className="text-xs text-slate-500 mt-1 font-medium">고객 만족도</p>
-          </div>
-        </div>
-      </section>
-
-      {/* 3. 리드 수집 신청 폼 섹션 */}
-      <section className="py-16 px-4 max-w-xl mx-auto">
-        <div className="bg-white p-8 rounded-3xl shadow-xl border border-slate-100 transition-all duration-300 hover:shadow-2xl">
-          <h3 className="text-2xl font-bold text-center mb-2">원장님 전용 무료 한도 조회</h3>
-          <p className="text-center text-sm text-slate-500 mb-8">입력하신 정보는 암호화 처리되며, 단순 조회는 신용도에 무해합니다.</p>
-          
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <div>
-              <label className="block text-sm font-semibold mb-1 text-slate-700">병·의원명 / 진료과목</label>
-              <input 
-                type="text" required placeholder="예: OO의원" 
-                className="w-full border border-slate-200 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
-                value={formData.hospital_name} onChange={(e) => setFormData({...formData, hospital_name: e.target.value})}
-              />
-            </div>
             
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-semibold mb-1 text-slate-700">원장님 성함</label>
-                <input 
-                  type="text" required placeholder="홍길동" 
-                  className="w-full border border-slate-200 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
-                  value={formData.manager_name} onChange={(e) => setFormData({...formData, manager_name: e.target.value})}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold mb-1 text-slate-700">연락처</label>
-                <input 
-                  type="tel" required placeholder="010-XXXX-XXXX" 
-                  className="w-full border border-slate-200 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
-                  value={formData.phone} onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                />
+            <h1 className="text-2xl md:text-5xl font-black tracking-tight mb-4 md:mb-6 leading-tight text-white break-keep">
+              개원 · 장비도입 · 확장자금<br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-300">
+                현재 상황에서 가능한 조달 방안을
+              </span> 확인해보세요
+            </h1>
+            
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-4 md:p-5 mb-6 md:mb-0 inline-block text-left w-full max-w-xl">
+              <div className="space-y-2 text-xs md:text-sm text-slate-300 font-medium">
+                <p className="flex items-center gap-2"><span className="text-indigo-400 font-bold">✓</span> 면허 보유 의료인 대상 전용 맞춤 프로그램</p>
+                <p className="flex items-center gap-2"><span className="text-indigo-400 font-bold">✓</span> 신용도 하락 우려 없는 안심 사전 구조 조회</p>
+                <p className="flex items-center gap-2"><span className="text-indigo-400 font-bold">✓</span> 의료 장비 · 인테리어 · 운전자금 포괄 매칭</p>
               </div>
             </div>
+          </div>
 
-            <div>
-              <label className="block text-sm font-semibold mb-1 text-slate-700">활용 가능 자산 선택</label>
-              <select 
-                className="w-full border border-slate-200 rounded-xl p-3 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
-                value={formData.asset_type} onChange={(e) => setFormData({...formData, asset_type: e.target.value})}
-              >
-                <option value="카드매출 (월 5천 이상)">월 카드매출 5,000만 이상</option>
-                <option value="임차보증금 유동화">병원 임차보증금 활용</option>
-                <option value="의료기기 (신규/중고)">보유 또는 신규 의료기기</option>
-              </select>
-            </div>
+          {/* 첫 화면 우측 고전환 입력 폼 */}
+          <div id="diagnostic-form" className="lg:col-span-5 w-full max-w-md mx-auto">
+            <div className="bg-white text-slate-900 rounded-3xl p-5 md:p-8 shadow-2xl border border-slate-100">
+              <div className="text-center mb-4">
+                <h2 className="text-lg md:text-xl font-black text-slate-900 tracking-tight">의료인 전용 자금 조달 진단</h2>
+                <p className="text-slate-500 text-[11px] mt-0.5">병원 상황에 맞는 최적의 포트폴리오 사전 검토 리포트를 발송해 드립니다.</p>
+              </div>
 
-            <div>
-              <label className="block text-sm font-semibold mb-1 text-slate-700">희망 자금 규모</label>
-              <select 
-                className="w-full border border-slate-200 rounded-xl p-3 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
-                value={formData.funds} onChange={(e) => setFormData({...formData, funds: e.target.value})}
-              >
-                <option value="5천만원 이하">5,000만 원 이하</option>
-                <option value="1억원 내외">1억 원 내외</option>
-                <option value="2억원~3억원">2억 원 ~ 3억 원</option>
-                <option value="3억원 이상 대규모">3억 원 이상 대규모 자금</option>
-              </select>
-            </div>
+              <form className="space-y-4" onSubmit={handleSubmit}>
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">병·의원명 / 진료과목</label>
+                  <input type="text" required value={formData.hospital_name} onChange={(e) => setFormData({...formData, hospital_name: e.target.value})} className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:outline-none focus:border-indigo-500 text-sm font-medium" placeholder="예: OO의원 (피부과)" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">원장님 성함</label>
+                  <input type="text" required value={formData.manager_name} onChange={(e) => setFormData({...formData, manager_name: e.target.value})} className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:outline-none focus:border-indigo-500 text-sm font-medium" placeholder="원장님 성함 입력" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">연락처</label>
+                  <input type="tel" required value={formData.phone} onChange={(e) => setFormData({...formData, phone: e.target.value})} className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:outline-none focus:border-indigo-500 text-sm font-medium" placeholder="010-XXXX-XXXX" />
+                </div>
 
-            <div className="space-y-2 pt-2 text-xs text-slate-600 border-t border-slate-100">
-              <label className="flex items-center gap-2.5 cursor-pointer p-1 rounded hover:bg-slate-50 transition-colors">
-                <input type="checkbox" required className="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer" />
-                <span className="select-none"><span className="text-red-500 font-bold">[필수]</span> 개인정보 수집 및 이용 동의</span>
-              </label>
-              <label className="flex items-center gap-2.5 cursor-pointer p-1 rounded hover:bg-slate-50 transition-colors">
-                <input type="checkbox" required className="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer" />
-                <span className="select-none"><span className="text-red-500 font-bold">[필수]</span> 현재 금융기관 연체 및 세금 체납 사실이 전혀 없습니다.</span>
-              </label>
-            </div>
+                <div className="space-y-1.5 pt-1 text-xs text-slate-600 border-t border-slate-100">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" required className="h-3.5 w-3.5 accent-indigo-600 cursor-pointer rounded" />
+                    <span className="select-none text-[11px] text-slate-500"><span className="text-red-500 font-bold">[필수]</span> 개인정보 수집 및 이용 동의</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" required className="h-3.5 w-3.5 accent-indigo-600 cursor-pointer rounded" />
+                    <span className="select-none text-[11px] text-slate-500"><span className="text-red-500 font-bold">[필수]</span> 금융기관 연체 및 세금 체납 사실이 없습니다.</span>
+                  </label>
+                </div>
 
-            <div className="pt-2">
-              <button 
-                type="submit" disabled={isSubmitting}
-                className="w-full bg-indigo-600 text-white font-bold p-4 rounded-xl shadow-lg hover:bg-indigo-700 active:scale-95 transition-all disabled:bg-slate-300"
-              >
-                {isSubmitting ? '보안 서버 시스템 전송 중...' : '실시간 한도 조회 신청하기'}
-              </button>
+                <button type="submit" disabled={isSubmitting} className="w-full bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-300 text-white font-black py-4 rounded-xl shadow-lg shadow-indigo-600/10 transition-transform active:scale-[0.98] text-sm tracking-wide">
+                  {isSubmitting ? '보안 서버 시스템 분석 중...' : '병원 상황에 맞는 자금 조달 방안 알아보기'}
+                </button>
+              </form>
             </div>
-          </form>
+          </div>
+
         </div>
       </section>
 
-      {/* 🔥 4. [신설] 원장님 다이렉트 의문 해결 Q&A 섹션 */}
+      {/* 2. 🔄 수정 완료: 실적 지표 섹션 (불확실한 약속 문구 삭제 및 완벽한 수치 시각화 통일) */}
+      <section className="py-10 bg-white border-b border-slate-100 px-4">
+        <div className="max-w-4xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 text-center">
+          <div className="p-2 border-r border-slate-100 last:border-none">
+            <p className="text-2xl md:text-3xl font-black text-indigo-600">1,700건+</p>
+            <p className="text-[11px] text-slate-500 mt-0.5 font-medium">누적 상담 검토</p>
+          </div>
+          <div className="p-2 md:border-r border-slate-100 last:border-none">
+            <p className="text-2xl md:text-3xl font-black text-indigo-600">전담 담당자</p>
+            <p className="text-[11px] text-slate-500 mt-0.5 font-medium">1:1 상담</p>
+          </div>
+          <div className="p-2 border-r border-slate-100 last:border-none">
+            <p className="text-2xl md:text-3xl font-black text-indigo-600">무료</p>
+            <p className="text-[11px] text-slate-500 mt-0.5 font-medium">사전 검토</p>
+          </div>
+          <div className="p-2 last:border-none">
+            <p className="text-2xl md:text-3xl font-black text-indigo-600">병원별</p>
+            <p className="text-[11px] text-slate-500 mt-0.5 font-medium">맞춤 안내</p>
+          </div>
+        </div>
+      </section>
+
+      {/* 3. 거울 효과 섹션 (이런 병원에서 문의하고 있습니다) */}
+      <section className="py-14 bg-slate-100/60 px-4 border-b border-slate-200/40">
+        <div className="max-w-2xl mx-auto">
+          <h3 className="text-center font-bold text-slate-500 text-xs md:text-sm tracking-wider uppercase mb-6">
+            📍 현재 대구·경북 지역 다양한 진료과에서 문의를 통해 최적화 방안을 검토 중입니다
+          </h3>
+          <div className="grid grid-cols-2 gap-3 text-center">
+            <div className="bg-white p-4 rounded-xl border border-slate-200/60 shadow-sm">
+              <p className="text-base font-bold text-slate-900">🏥 피부과</p>
+              <p className="text-slate-500 text-xs mt-1">신규 개원 준비 자금 조달</p>
+            </div>
+            <div className="bg-white p-4 rounded-xl border border-slate-200/60 shadow-sm">
+              <p className="text-base font-bold text-slate-900">🩺 정형외과</p>
+              <p className="text-slate-500 text-xs mt-1">고가 첨단 MRI 장비 추가 도입</p>
+            </div>
+            <div className="bg-white p-4 rounded-xl border border-slate-200/60 shadow-sm">
+              <p className="text-base font-bold text-slate-900">🦷 치과</p>
+              <p className="text-slate-500 text-xs mt-1">네트워크 확장 및 대규모 이전</p>
+            </div>
+            <div className="bg-white p-4 rounded-xl border border-slate-200/60 shadow-sm">
+              <p className="text-base font-bold text-slate-900">🩺 내과</p>
+              <p className="text-slate-500 text-xs mt-1">인테리어 리모델링 및 운전자금</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 4. 브랜드 에셋 비주얼 배너 */}
+      <section className="py-16 px-4 max-w-4xl mx-auto text-center">
+        <h2 className="text-xl md:text-2xl font-bold text-slate-900 mb-2">원장님을 위한 1:1 포트폴리오 케어</h2>
+        <p className="text-slate-500 text-xs md:text-sm mb-8">안전한 리스크 방어망 구축과 합법적인 소득세 절세 프로세스 수립</p>
+        <div className="flex justify-center">
+          <div className="w-full max-w-md rounded-2xl overflow-hidden shadow-md bg-slate-200 aspect-[4/3]">
+            <img 
+              src="/images/hero-doctor.jpg" 
+              alt="메디컬 금융 전문가 리포트 가이드" 
+              className="w-full h-full object-cover"
+              loading="lazy"
+              onError={(e) => { 
+                e.target.onerror = null;
+                e.target.src = 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&w=800&q=80'; 
+              }}
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* 5. 원장님 다이렉트 의문 해결 Q&A 아코디언 섹션 */}
       <section className="py-16 bg-white border-t border-b border-slate-100 px-4">
         <div className="max-w-2xl mx-auto">
-          <h2 className="text-2xl font-bold text-center text-slate-900 mb-2">가장 자주 묻는 질문</h2>
-          <p className="text-center text-sm text-slate-500 mb-10">금융 솔루션 신청 전 원장님들께서 가장 우려하시는 사실을 명확히 대답해 드립니다.</p>
+          <h2 className="text-xl md:text-2xl font-bold text-center text-slate-900 mb-2">가장 자주 묻는 질문</h2>
+          <p className="text-center text-xs text-slate-500 mb-8">금융 구조 분석 신청 전 원장님들께서 가장 우려하시는 핵심 사항을 사실 그대로 안내합니다.</p>
           
-          <div className="space-y-4">
+          <div className="space-y-3.5">
             {faqData.map((faq, index) => {
               const isOpen = activeFaq === index;
               return (
@@ -246,16 +263,16 @@ export default function LandingPage() {
                   <button
                     type="button"
                     onClick={() => toggleFaq(index)}
-                    className="w-full text-left p-5 font-bold text-sm md:text-base flex items-center justify-between gap-4 bg-white hover:bg-slate-50 transition-colors"
+                    className="w-full text-left p-4 md:p-5 font-bold text-sm flex items-center justify-between gap-4 bg-white hover:bg-slate-50 transition-colors"
                   >
-                    <span className="text-slate-900 break-keep"><span className="text-indigo-600 mr-2">Q.</span> {faq.q}</span>
-                    <span className={`text-indigo-500 font-bold text-xl transform transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}>
+                    <span className="text-slate-900 break-keep"><span className="text-indigo-600 mr-1">Q.</span> {faq.q}</span>
+                    <span className={`text-indigo-500 font-bold text-base transform transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}>
                       ▼
                     </span>
                   </button>
                   
                   <div className={`transition-all duration-300 overflow-hidden ${isOpen ? 'max-h-60 border-t border-slate-150' : 'max-h-0'}`}>
-                    <p className="p-5 text-sm leading-relaxed text-slate-600 bg-slate-50 break-keep">
+                    <p className="p-4 md:p-5 text-xs md:text-sm leading-relaxed text-slate-600 bg-slate-50 break-keep">
                       {faq.a}
                     </p>
                   </div>
@@ -266,30 +283,30 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* 5. 푸터 섹션 */}
-      <footer className="bg-slate-900 text-slate-400 text-xs py-12 px-4">
+      {/* 6. 푸터 영역 */}
+      <footer className="bg-slate-900 text-slate-400 text-[11px] py-10 px-4 border-t border-slate-800">
         <div className="max-w-4xl mx-auto space-y-4">
-          <div className="flex flex-wrap gap-x-6 gap-y-2 text-slate-300 font-semibold">
-            <span>상호명: 광고대행사 노네임</span>
+          <div className="flex flex-wrap gap-x-5 gap-y-1.5 text-slate-300 font-semibold text-xs justify-center md:justify-start">
+            <span>상호명: 노네임</span>
             <span>대표자: 이정현</span>
             <span>사업자등록번호: 635-67-00527</span>
           </div>
           
-          <div className="space-y-1 text-slate-500">
+          <div className="space-y-1 text-slate-500 text-center md:text-left">
             <p>주소: 대구 북구 동북로291 901-a97</p>
             <p>고객상담센터: 050-6553-1135 | 이메일: leezdb88@gmail.com</p>
           </div>
           
           <hr className="border-slate-800" />
           
-          <div className="text-[11px] text-slate-500 space-y-2 leading-relaxed">
+          <div className="text-[10px] text-slate-500 space-y-2 leading-relaxed text-justify md:text-left">
             <p>
-              ※ 본 사이트에서 안내하는 금융 상품 및 프로그램은 플라톤마케팅과의 독점 총판 가맹 계약 체결을 기반으로 정식 지원 및 운영됩니다. 개별 병원·약국의 신용도, 재무 안정성 및 카드매출 이력 등의 심사 결과에 따라 최종 승인 여부, 금리 및 한도 조건은 상이하거나 부결될 수 있습니다.
+              ※ 본 사이체서 안내하는 금융 상품 및 프로그램은 플라톤마케팅과의 가맹 계약 체결을 기반으로 정식 지원 및 운영됩니다. 개별 병원·약국의 신용도, 재무 안정성 및 카드매출 이력 등의 심사 결과에 따라 최종 승인 여부, 금리 및 한도 조건은 상이하거나 부결될 수 있습니다.
             </p>
             <p>
               ※ 본 사전 한도 조회 서비스는 간이 조회 방식으로 진행되어 원장님의 개인 신용등급에 어떠한 영향도 주지 않으며, 신청 및 상담 과정에서 별도의 불법 중개 수수료나 취급 수수료의 선입금을 절대 요구하지 않습니다.
             </p>
-            <p className="pt-2 text-slate-600 font-medium">
+            <p className="pt-2 text-slate-600 font-medium text-center md:text-left">
               © 2026 Platon Marketing. All Rights Reserved.
             </p>
           </div>
