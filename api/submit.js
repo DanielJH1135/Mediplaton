@@ -31,7 +31,7 @@ export default async function handler(req, res) {
           { name: "보유 자산을 활용한 자금조달 유형", value: "상담 시 확인", inline: true },
           { name: "필요 자금 규모", value: "상담 시 확인", inline: true }
         ],
-        footer: { text: "KS 대구지사 데이터 센터" }
+        footer: { text: "메디플라톤X노네임 DB Center" }
       }]
     };
 
