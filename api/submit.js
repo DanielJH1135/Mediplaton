@@ -1,33 +1,52 @@
 export default async function handler(req, res) {
-  // POST 요청이 아니면 입구 컷
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: '허용되지 않는 요청 방식입니다.' });
+    return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  // 🔥 사장님이 새로 주신 정확한 주소를 백엔드 코드에 직접 매립 (브라우저 F12에선 절대 안 보임)
-  const GAS_URL = "https://script.google.com/macros/s/AKfycbxWcBJJllgTxEolLTIrUPPMhj9WmeiWOXeDzkPbVXKGX-LaeeiW5r_NBOh2J04Y4BSN/exec";
-
   try {
-    const response = await fetch(GAS_URL, {
+    const formData = req.body;
+
+    // 1. [구글 시트 전송] 배포하신 구글 웹앱 주소를 여기에 넣어주세요
+    const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxWcBJJllgTxEolLTIrUPPMhj9WmeiWOXeDzkPbVXKGX-LaeeiW5r_NBOh2J04Y4BSN/exec";
+
+    const googleResponse = await fetch(GAS_WEB_APP_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(req.body),
+      body: JSON.stringify(formData),
     });
+    const googleData = await googleResponse.json();
 
-    const resText = await response.text();
+    // 2. [디스코드 전송] 이제 안전한 Vercel 인프라 서버에서 직접 디스코드로 로켓 발사!
+    const discordWebhookUrl = "https://discord.com/api/webhooks/1511709116035502150/qooURmb7DKbGkvGIO2LF26kNKri1_1I_CSF89Y6M3HCRjkj5rW5jnrZgd3jrY7xnKUdR";
     
-    try {
-      // 구글이 정상적으로 JSON을 반환한 경우 그대로 토스
-      const data = JSON.parse(resText);
-      return res.status(200).json(data);
-    } catch (parseError) {
-      // 구글 스크립트가 성공 후 리다이렉트나 텍스트를 반환하더라도 유연하게 성공 처리
-      if (resText.includes('success') || response.ok) {
-        return res.status(200).json({ result: 'success' });
-      }
-      return res.status(500).json({ error: '구글 응답 파싱 실패', details: resText });
-    }
+    const discordPayload = {
+      username: "메디플라톤 알림봇",
+      embeds: [{
+        title: "🏥 CPA 신규 병원장 DB 인입 (Vercel 안전 적재)",
+        color: 3447003,
+        fields: [
+          { name: "병 의원명", value: formData.hospital_name || "상담 시 확인", inline: true },
+          { name: "원장 약사명", value: formData.manager_name || "상담 시 확인", inline: true },
+          { name: "연락처", value: formData.phone || "상담 시 확인", inline: false },
+          { name: "보유 자산을 활용한 자금조달 유형", value: "상담 시 확인", inline: true },
+          { name: "필요 자금 규모", value: "상담 시 확인", inline: true }
+        ],
+        footer: { text: "KS 대구지사 데이터 센터" }
+      }]
+    };
+
+    // 디스코드로 동시 발사 (차단될 확률 0%)
+    await fetch(discordWebhookUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(discordPayload),
+    }).catch(err => console.error("디스코드 전송 실패:", err));
+
+    // 구글 시트 결과 리턴
+    return res.status(200).json(googleData);
+
   } catch (error) {
-    return res.status(500).json({ error: '보안 서버 통신 실패', message: error.message });
+    console.error("서버 내부 에러:", error);
+    return res.status(500).json({ result: 'error', message: error.toString() });
   }
 }
