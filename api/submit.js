@@ -17,7 +17,7 @@ export default async function handler(req, res) {
     const googleData = await googleResponse.json();
 
     // 2. [디스코드 전송] 이제 안전한 Vercel 인프라 서버에서 직접 디스코드로 로켓 발사!
-    const discordWebhookUrl = "https://discord.com/api/webhooks/1511709116035502150/qooURmb7DKbGkvGIO2LF26kNKri1_1I_CSF89Y6M3HCRjkj5rW5jnrZgd3jrY7xnKUdR";
+    const discordWebhookUrl = process.env.DISCORD_WEBHOOK_URL;
     
     const discordPayload = {
       username: "메디플라톤 알림봇",
